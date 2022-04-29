@@ -1,13 +1,18 @@
+import socket
+
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty
-from kivy.uix.button import Button
-from kivy.clock import Clock
-
+from kivy.network.urlrequest import UrlRequest
+import requests
+import threading
 
 KV = """ 
 MyBL:
+        orientation: "vertical"
+        size_hint: (0.95, 0.95)
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
         Label:
                 id: text_label
                 font_size: "30sp"
@@ -15,10 +20,24 @@ MyBL:
         TextInput:
                 id: text_input
                 multiline: False
-                size_hint: (0.5,0.1)
+                size_hint: (1,0.1)
         Button:
                 id: button_label
-                text: "Кнопка"
+                text: "Изменить надпись"
+                bold: True
+                background_color:'#00FFCE'
+                size_hint: (1,0.5)
+                on_press: root.changetitle()
+        Button:
+                id: button_label1
+                text: "Вывести список докторов"
+                bold: True
+                background_color:'#00FFCE'
+                size_hint: (1,0.5)
+                on_press: root.GetDoctors()
+        Button:
+                id: button_label2
+                text: "Кнопка2"
                 bold: True
                 background_color:'#00FFCE'
                 size_hint: (1,0.5)
@@ -26,11 +45,23 @@ MyBL:
 """ # Включаем виджеты для верстки
 
 class MyBL(BoxLayout):
+
     data_label = StringProperty("Текст")
-    def callback(self):
-        data_label = StringProperty("Вы нажали на кнопку")
+
+   # def __init__(self, **kwargs):
+    #    super().__init__(**kwargs)
+        #threading.Thread(target=self.get_data).start() #Инициализируем поток, для функции GetDoctors
+
+    def changetitle(self):
         name = self.ids.text_input.text
-        self.ids.text_label.text = name
+        self.ids.text_label.text = name #f'hello {name}' - для вывода дополненного текста
+        self.ids.text_input.text = ''
+
+    def GetDoctors(self): #Получим список всех докторов
+        doctors = requests.get('https://localhost:5001/doctors', verify = False)
+        self.ids.text_label.text = doctors.text
+
+
 
 class MyApp(App):
     running = True
