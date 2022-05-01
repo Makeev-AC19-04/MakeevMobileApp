@@ -1,12 +1,16 @@
 import socket
 
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty
+from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 import requests
+import json
 import threading
+
+#Window.size = (720, 1280) #Разрешение экрана моего телефона
 
 KV = """ 
 MyBL:
@@ -16,11 +20,12 @@ MyBL:
         Label:
                 id: text_label
                 font_size: "30sp"
+                color: "000000"
                 text: root.data_label
         TextInput:
                 id: text_input
                 multiline: False
-                size_hint: (1,0.1)
+                size_hint: (1,0.3)
         Button:
                 id: button_label
                 text: "Изменить надпись"
@@ -41,7 +46,8 @@ MyBL:
                 bold: True
                 background_color:'#00FFCE'
                 size_hint: (1,0.5)
-                on_press: root.callback()
+                on_press: root.callback() 
+        
 """ # Включаем виджеты для верстки
 
 class MyBL(BoxLayout):
@@ -59,11 +65,11 @@ class MyBL(BoxLayout):
 
     def GetDoctors(self): #Получим список всех докторов
         doctors = requests.get('https://localhost:5001/doctors', verify = False)
-        self.ids.text_label.text = doctors.text
+        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
 
 
 
-class MyApp(App):
+class MyApp(MDApp):
     running = True
 
     def build(self):
