@@ -12,43 +12,53 @@ import threading
 
 #Window.size = (720, 1280) #Разрешение экрана моего телефона
 
-KV = """ 
+KV = """
 MyBL:
-        orientation: "vertical"
-        size_hint: (0.95, 0.95)
-        pos_hint: {"center_x": 0.5, "center_y":0.5}
-        Label:
-                id: text_label
-                font_size: "30sp"
-                color: "000000"
-                text: root.data_label
-        TextInput:
-                id: text_input
-                multiline: False
-                size_hint: (1,0.3)
-        Button:
-                id: button_label
-                text: "Изменить надпись"
-                bold: True
-                background_color:'#00FFCE'
-                size_hint: (1,0.5)
-                on_press: root.changetitle()
-        Button:
-                id: button_label1
-                text: "Вывести список докторов"
-                bold: True
-                background_color:'#00FFCE'
-                size_hint: (1,0.5)
-                on_press: root.GetDoctors()
-        Button:
-                id: button_label2
-                text: "Кнопка2"
-                bold: True
-                background_color:'#00FFCE'
-                size_hint: (1,0.5)
-                on_press: root.callback() 
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: "vertical"
+                    MDToolbar:
+                        title: "Navigation Drawer"
+                        elevation: 10
+                        left_action_items: [['menu', lambda x: nav_drawer.set_state('toggle')]]
+                    Widget:
+                        orientation: "vertical"
+                        MDLabel:
+                            id: text_label
+                            font_size: "30sp"
+                            color: "000000"
+                            text: root.data_label
+                            pos_hint: {"center_x": 1, "center_y":1}
+                        MDRectangleFlatButton:
+                            id: button_label
+                            text: "Изменить надпись"
+                            background_color:'#00FFCE'
+                            pos_hint: {"center_x":1, "center_y":1}
+                            on_press: root.changetitle()
+                        MDRectangleFlatButton:
+                            id: button_label1
+                            text: "Вывести список докторов"
+                            bold: True
+                            background_color:'#00FFCE'
+                            size_hint: (1,0.5)
+                            on_press: root.GetDoctors()
+                        MDTextField:
+                            id: text_input
+                            hint_text: "No helper text"
+                        
+                    
+                        
+                        
+        MDNavigationDrawer:
+            id: nav_drawer 
+            ContentNavigationDrawer:
         
 """ # Включаем виджеты для верстки
+
+class ContentNavigationDrawer(BoxLayout): #Отрисовка элементов панели навигации
+    pass
 
 class MyBL(BoxLayout):
 
@@ -65,18 +75,22 @@ class MyBL(BoxLayout):
 
     def GetDoctors(self): #Получим список всех докторов
         doctors = requests.get('https://localhost:5001/doctors', verify = False)
-        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
-
+        self.ids.text_label.text = doctors.text
 
 
 class MyApp(MDApp):
-    running = True
+    data_label = StringProperty("Текст")
+
+    def changetitle(self):
+        name = self.ids.text_input.text
+        self.ids.text_label.text = name #f'hello {name}' - для вывода дополненного текста
+        self.ids.text_input.text = ''
+
+    def GetDoctors(self): #Получим список всех докторов
+        doctors = requests.get('https://localhost:5001/doctors', verify = False)
+        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
 
     def build(self):
         return Builder.load_string(KV)
 
-    def on_stop(self):
-        self.running = False
-
-app = MyApp()
-app.run()
+MyApp().run()
