@@ -9,6 +9,7 @@ import requests
 import json
 
 #GithubTest
+#Комментарий от Ильи
 
 KV = """
 MDNavigationLayout:
@@ -69,7 +70,7 @@ MDNavigationLayout:
         font_size: "30sp"
         color: "000000"
         text: "Вход в аккаунт"
-        pos_hint: {"center_x": 1, "center_y":1}
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
     MDTextField:
         id: text_login
         required: True
@@ -92,7 +93,7 @@ MDNavigationLayout:
         text: "Войти"
         background_color:'#00FFCE'
         pos_hint: {"center_x":1, "center_y":1}
-        on_press: root.changetitle()
+        on_press: root.send_auth()
     MDLabel:
         id: text_role
         font_size: "30sp"
@@ -146,6 +147,9 @@ class DoctorsScreen(Screen):
         doctors = requests.get('https://localhost:5001/doctors', verify=False) #        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
         self.ids.text_label.text = doctors.text
     pass
+
+    def Auth(self):
+        auth_body = requests.post
 
 class OtherScreen(Screen):
     pass
