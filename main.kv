@@ -1,0 +1,68 @@
+NavigationLayout:
+    ScreenManager: #Отрисовка текущего экрана
+        id: screen_manager
+        Screen:
+            BoxLayout:
+                orientation: "vertical"
+                MDToolbar:
+                    title: "Navigation Drawer"
+                    left_action_items: [['menu', lambda x: nav_drawer.set_state('toggle')]]
+                    elevation: 10
+                Widget:
+        DoctorsScreen:
+        OtherScreen:
+    MDNavigationDrawer: #Отрисовка панели навигации
+        id: nav_drawer
+        BoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                text: 'Меню'
+            ScrollView:
+                MDList:
+                    OneLineListItem:
+                        text: 'Список всех докторов'
+                        on_press:
+                            #nav_drawer.set_state("close")
+                            screen_manager.current = 'Doctors'
+                    OneLineListItem:
+                        text: 'Открыть другой экран'
+                        on_press:
+                            #nav_drawer.set_state("close")
+                            screen_manager.current = 'Other'
+        ContentNavigationDrawer:
+            id: content_drawer
+
+<OtherScreen>
+    name: 'Other'
+    orientation: "vertical"
+    MDLabel:
+        id: text_label
+        font_size: "30sp"
+        color: "000000"
+        text: "Other text"
+        pos_hint: {"center_x": 1, "center_y":1}
+
+<DoctorsScreen>
+    name: 'Doctors'
+    orientation: "vertical"
+    MDLabel:
+        id: text_label
+        font_size: "30sp"
+        color: "000000"
+        text: root.data_label
+        pos_hint: {"center_x": 1, "center_y":1}
+    MDRectangleFlatButton:
+        id: button_label
+        text: "Изменить надпись"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":1, "center_y":1}
+        on_press: root.changetitle()
+    MDRectangleFlatButton:
+        id: button_label1
+        text: "Вывести список докторов"
+        bold: True
+        background_color:'#00FFCE'
+        on_press: root.GetDoctors()
+    MDTextField:
+        id: text_input
+        hint_text: "No helper text"
