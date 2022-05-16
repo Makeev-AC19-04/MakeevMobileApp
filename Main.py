@@ -31,6 +31,9 @@ class DoctorsScreen(Screen):
         self.ids.text_label.text = doctors.text
     pass
 
+class MainScreen(Screen):
+    pass
+
 class NavigationLayout(Screen):
     pass
 
@@ -55,6 +58,7 @@ class MainApp(MDApp):
     #theme_cls = ThemeManager()
     def build(self):
         sm = ScreenManager()
+        sm.add_widget(MainScreen(name='Main'))
         sm.add_widget(NavigationLayout(name='Nav'))
         sm.add_widget(DoctorsScreen(name='Doctors'))
         sm.add_widget(OtherScreen(name='Other'))
