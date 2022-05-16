@@ -12,7 +12,12 @@ import json
 #Crossplatform kaif
 #Комментарий от Ильи
 
-access_token = '' #Токен авторизации
+class AccessToken():
+    token = 'token'
+    def __init__(self, newtkn):
+        token = newtkn
+
+access_token = AccessToken('tut token') #Токен авторизации
 
 class ContentNavigationDrawer(BoxLayout): #Отрисовка элементов панели навигации
     pass
@@ -37,7 +42,37 @@ class NavigationLayout(Screen):
 class OtherScreen(Screen):
     pass
 
+class ChangeDoctorScreen(Screen):
+    global access_token
+    doctorsdata = {}
+
+    def SearchDoctor(self):
+        doctor = requests.get('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text, verify=False)
+        if doctor.status_code == 404:
+            self.ids.text_label.text = "Доктор не найден!"
+        else:
+            self.ids.text_label.text = "Редактировать данные о докторе"
+            self.ids.text_doctorsname.text = str(doctor.json()["name"])
+            self.ids.text_doctorsspeciality.text = str(doctor.json()["specialityId"])
+            self.doctorsdata = doctor.json()
+
+    def ChangeDoctor(self):
+        self.doctorsdata['name'] = self.ids.text_doctorsname.text
+        self.doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
+        putreq = requests.put('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text,
+                              verify=False,
+                              json=self.doctorsdata,
+                              headers={'Authorization': "Bearer {}".format(access_token.token)})
+        if putreq.status_code == 200:
+         self.ids.text_label.text = "Данные сохранены"
+        elif putreq.status_code == 401:
+         self.ids.text_label.text = "Вы не авторизованы"
+        else:
+         self.ids.text_label.text = "Произошла ошибка"
+    pass
+
 class AuthorizationScreen(Screen):
+    global access_token
     def Auth(self):
         session = requests.Session()
         auth_data = {"login":self.ids.text_login.text,"password":self.ids.text_password.text}
@@ -45,8 +80,10 @@ class AuthorizationScreen(Screen):
         if auth_body.status_code == 400:
             self.ids.text_role.text = "Неверный логин или пароль!"
         else:
-            access_token = auth_body.json()["access_token"]
-            role = session.get('https://localhost:5001/values/getrole', headers={'Authorization': "Bearer {}".format(access_token)}, verify=False)
+            access_token.token = auth_body.json()["access_token"]
+            role = session.get('https://localhost:5001/values/getrole',
+                               headers={'Authorization': "Bearer {}".format(access_token.token)},
+                               verify=False)
             self.ids.text_role.text = str(role.text)
     pass
 
@@ -59,6 +96,7 @@ class MainApp(MDApp):
         sm.add_widget(DoctorsScreen(name='Doctors'))
         sm.add_widget(OtherScreen(name='Other'))
         sm.add_widget(AuthorizationScreen(name='Authorization'))
+        sm.add_widget(ChangeDoctorScreen(name='ChangeDoctor'))
        #screen = Builder.load_string(KV)
         return sm
 
