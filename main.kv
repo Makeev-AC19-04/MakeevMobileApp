@@ -1,4 +1,6 @@
+#:kivy 1.0.9
 NavigationLayout:
+<NavigationLayout>:
     ScreenManager: #Отрисовка текущего экрана
         id: screen_manager
         Screen:
@@ -13,10 +15,12 @@ NavigationLayout:
         OtherScreen:
     MDNavigationDrawer: #Отрисовка панели навигации
         id: nav_drawer
+        width: dp(300)
         BoxLayout:
             orientation: 'vertical'
-            MDLabel:
+            MDLabel: 
                 text: 'Меню'
+                
             ScrollView:
                 MDList:
                     OneLineListItem:
@@ -32,7 +36,7 @@ NavigationLayout:
         ContentNavigationDrawer:
             id: content_drawer
 
-<OtherScreen>
+<OtherScreen>:
     name: 'Other'
     orientation: "vertical"
     MDLabel:
@@ -42,7 +46,7 @@ NavigationLayout:
         text: "Other text"
         pos_hint: {"center_x": 1, "center_y":1}
 
-<DoctorsScreen>
+<DoctorsScreen>:
     name: 'Doctors'
     orientation: "vertical"
     MDLabel:
