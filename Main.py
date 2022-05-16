@@ -13,9 +13,6 @@ import json
 #Комментарий от Ильи
 
 
-
-
-
 class ContentNavigationDrawer(BoxLayout): #Отрисовка элементов панели навигации
     pass
 
@@ -41,8 +38,6 @@ class OtherScreen(Screen):
 
 class AuthorizationScreen(Screen):
     pass
-
-
 
 
 class MainApp(MDApp):
