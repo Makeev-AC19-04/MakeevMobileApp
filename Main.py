@@ -6,6 +6,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import requests
 import json
 
+#GithubTest
+
 KV = """
 MDNavigationLayout:
     ScreenManager: #Отрисовка текущего экрана
