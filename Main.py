@@ -37,6 +37,11 @@ class OtherScreen(Screen):
     pass
 
 class AuthorizationScreen(Screen):
+    def Auth(self):
+        session = requests.Session()
+        auth_data = {"login":self.ids.text_login.text,"password":self.ids.text_password.text}
+        auth_token = session.post('https://localhost:5001/account/login', json=auth_data, verify=False)
+        self.ids.text_role.text = str(auth_token.json())
     pass
 
 
