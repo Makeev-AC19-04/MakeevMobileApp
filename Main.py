@@ -12,6 +12,7 @@ import json
 #Crossplatform kaif
 #Комментарий от Ильи
 
+access_token = '' #Токен авторизации
 
 class ContentNavigationDrawer(BoxLayout): #Отрисовка элементов панели навигации
     pass
@@ -40,8 +41,13 @@ class AuthorizationScreen(Screen):
     def Auth(self):
         session = requests.Session()
         auth_data = {"login":self.ids.text_login.text,"password":self.ids.text_password.text}
-        auth_token = session.post('https://localhost:5001/account/login', json=auth_data, verify=False)
-        self.ids.text_role.text = str(auth_token.json())
+        auth_body = session.post('https://localhost:5001/account/login', json=auth_data, verify=False)
+        if auth_body.status_code == 400:
+            self.ids.text_role.text = "Неверный логин или пароль!"
+        else:
+            access_token = auth_body.json()["access_token"]
+            role = session.get('https://localhost:5001/values/getrole', headers={'Authorization': "Bearer {}".format(access_token)}, verify=False)
+            self.ids.text_role.text = str(role.text)
     pass
 
 
