@@ -1,4 +1,5 @@
 #:kivy 1.0.9
+<<<<<<< Updated upstream:Main.kv
 NavigationLayout:
 <NavigationLayout>:
     ScreenManager: #Отрисовка текущего экрана
@@ -39,6 +40,46 @@ NavigationLayout:
                             screen_manager.current = 'Authorization'
         ContentNavigationDrawer:
             id: content_drawer
+=======
+#:set SidebarW 300
+MainScreen:
+<MainScreen>:
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "MDNavigationDrawer"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+    NavigationLayout:
+        ScreenManager: #Отрисовка текущего экрана
+            id: screen_manager
+            Screen:
+            DoctorsScreen:
+            OtherScreen:
+            AuthorizationScreen:
+        MDNavigationDrawer: #Отрисовка панели навигации
+            id: nav_drawer
+            width: SidebarW
+            padding: SidebarW*0.05
+            ContentNavigationDrawer:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDLabel:
+                        text: 'Меню'
+                    ScrollView:
+                        MDList:
+                            OneLineListItem:
+                                text: 'Список всех докторов'
+                                on_press:
+                                    nav_drawer.set_state("close")
+                                    screen_manager.current = 'Doctors'
+                            OneLineListItem:
+                                text: 'Открыть другой экран'
+                                on_press:
+                                    nav_drawer.set_state("close")
+                                    screen_manager.current = 'Other'         
+>>>>>>> Stashed changes:main.kv
 
 <OtherScreen>
     name: 'Other'
@@ -50,7 +91,11 @@ NavigationLayout:
         text: "Other text"
         pos_hint: {"center_x": 0.5, "center_y":0.5}
 
+<<<<<<< Updated upstream:Main.kv
 <AuthorizationScreen>
+=======
+<AuthorizationScreen>:
+>>>>>>> Stashed changes:main.kv
     name: 'Authorization'
     orientation: "vertical"
     MDLabel:
@@ -112,4 +157,8 @@ NavigationLayout:
         on_press: root.GetDoctors()
     #MDTextField:
      #   id: text_input
+<<<<<<< Updated upstream:Main.kv
       #  hint_text: "No helper text"
+=======
+      #  hint_text: "No helper text"
+>>>>>>> Stashed changes:main.kv
