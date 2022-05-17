@@ -4,10 +4,10 @@ from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.list import MDList, TwoLineListItem
 from kivy.uix.scrollview import ScrollView
-from kivy.core.clipboard import Clipboard
-import requests
+from kivymd.toast.kivytoast.kivytoast import toast
 from kivy.clock import Clock
 import json
+import requests
 
 #GithubTest
 #Crossplatform kaif
@@ -15,6 +15,7 @@ import json
 
 class AccessToken():
     token = 'token'
+    link = 'https://localhost:5001/'
     def __init__(self, newtkn):
         token = newtkn
 
@@ -29,16 +30,28 @@ class DoctorsScreen(Screen):
 
     def GetDoctors(self):  # Получим список всех докторов
         self.ids.mdlist_doctors.clear_widgets() # Очищаем список для предотвращения дублирования
-        doctors = requests.get('https://localhost:5001/doctors', verify=False)
-        doctors = json.loads(doctors.text)  # Формируем список словарей из полученного json текста
-        for i in doctors:
-            self.ids.mdlist_doctors.add_widget(TwoLineListItem(text = i['name'], secondary_text = 'id:' + str(i['id'])))
+        try:
+            doctors = requests.get(access_token.link+'doctors/', verify=False)
+        except requests.exceptions.ConnectionError:
+            toast("Ошибка соединения")
+        else:
+            doctors = json.loads(doctors.text)  # Формируем список словарей из полученного json текста
+            for i in doctors:
+                self.ids.mdlist_doctors.add_widget(TwoLineListItem(text = i['name'], secondary_text = 'id:' + str(i['id'])))
     pass
 
 class MainScreen(Screen):
     pass
 
 class NavigationLayout(Screen):
+    pass
+
+class ChangeAdressScreen(Screen):
+    global access_token
+    link = access_token.link
+    def ChangeAdress(self):
+        access_token.link = self.ids.text_adress.text
+        toast("Адрес изменен")
     pass
 
 class ChangeDoctorScreen(Screen):
@@ -50,23 +63,21 @@ class ChangeDoctorScreen(Screen):
 
     def SearchDoctor(self):
         label = self.ids.text_label.text
-        doctor = requests.get('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text, verify=False)
+        doctor = requests.get(access_token.link+'doctors/' + self.ids.text_searchdoctor.text, verify=False)
         if doctor.status_code == 404:
             Clock.schedule_once(lambda dt: self.ChangeLabel("Доктор не найден!"))
             Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
         else:
-#            self.ids.text_label.text = "Редактировать данные о докторе"
             self.ids.text_doctorsname.text = str(doctor.json()["name"])
             self.ids.text_doctorsspeciality.text = str(doctor.json()["specialityId"])
             self.doctorsdata = doctor.json()
 
     def ChangeDoctor(self):
-        doctorsdata = {}
-        doctorsdata['name'] = self.ids.text_doctorsname.text
-        doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
-        putreq = requests.put('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text,
+        self.doctorsdata['name'] = self.ids.text_doctorsname.text
+        self.doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
+        putreq = requests.put(access_token.link+'doctors/' + self.ids.text_searchdoctor.text,
                               verify=False,
-                              json=doctorsdata,
+                              json=self.doctorsdata,
                               headers={'Authorization': "Bearer {}".format(access_token.token)})
         if putreq.status_code == 200:
             Clock.schedule_once(lambda dt: self.ChangeLabel("Данные сохранены"))
@@ -79,7 +90,7 @@ class ChangeDoctorScreen(Screen):
             Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
 
     def DeleteDoctor(self):
-        delreq = requests.delete('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text,
+        delreq = requests.delete(access_token.link+'doctors/' + self.ids.text_searchdoctor.text,
                               verify=False,
                               headers={'Authorization': "Bearer {}".format(access_token.token)})
         if delreq.status_code == 204:
@@ -93,11 +104,12 @@ class ChangeDoctorScreen(Screen):
             Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
 
     def PostDoctor(self):
-        self.doctorsdata['name'] = self.ids.text_doctorsname.text
-        self.doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
-        putreq = requests.post('https://localhost:5001/doctors/',
+        doctorsdata={}
+        doctorsdata['name'] = self.ids.text_doctorsname.text
+        doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
+        putreq = requests.post(access_token.link+'doctors/',
                               verify=False,
-                              json=self.doctorsdata,
+                              json=doctorsdata,
                               headers={'Authorization': "Bearer {}".format(access_token.token)})
         if putreq.status_code == 201:
             Clock.schedule_once(lambda dt: self.ChangeLabel("Доктор добавлен"))
@@ -116,12 +128,12 @@ class AuthorizationScreen(Screen):
     def Auth(self):
         session = requests.Session()
         auth_data = {"login":self.ids.text_login.text,"password":self.ids.text_password.text}
-        auth_body = session.post('https://localhost:5001/account/login', json=auth_data, verify=False)
+        auth_body = session.post(access_token.link+'account/login', json=auth_data, verify=False)
         if auth_body.status_code == 400:
             self.ids.text_role.text = "Неверный логин или пароль!"
         else:
             access_token.token = auth_body.json()["access_token"]
-            role = session.get('https://localhost:5001/values/getrole',
+            role = session.get(access_token.link+'values/getrole',
                                headers={'Authorization': "Bearer {}".format(access_token.token)},
                                verify=False)
             self.ids.text_role.text = str(role.text)
@@ -136,6 +148,7 @@ class MainApp(MDApp):
         sm.add_widget(DoctorsScreen(name='Doctors'))
         sm.add_widget(AuthorizationScreen(name='Authorization'))
         sm.add_widget(ChangeDoctorScreen(name='ChangeDoctor'))
+        sm.add_widget(ChangeAdressScreen(name='ChangeAdress'))
         return sm
 
 MainApp().run()

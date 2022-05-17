@@ -16,6 +16,7 @@ MainScreen:
             DoctorsScreen:
             AuthorizationScreen:
             ChangeDoctorScreen:
+            ChangeAdressScreen:
         MDNavigationDrawer: #Отрисовка панели навигации
             id: nav_drawer
             width: SidebarW
@@ -42,6 +43,11 @@ MainScreen:
                                 on_press:
                                     nav_drawer.set_state("close")
                                     screen_manager.current = 'ChangeDoctor'
+                            OneLineListItem:
+                                text: 'Изменить адрес сервера'
+                                on_press:
+                                    nav_drawer.set_state("close")
+                                    screen_manager.current = 'ChangeAdress'
 
 <AuthorizationScreen>:
     name: 'Authorization'
@@ -148,19 +154,45 @@ MainScreen:
         width:300
     MDRectangleFlatButton:
         id: button_searchdoctor
-        text: "Сохранить изменения"
+        text: "Сохранить\n изменения"
         background_color:'#00FFCE'
         pos_hint: {"center_x":0.25, "center_y":0.1}
         on_press: root.ChangeDoctor()
+        size_hint_x:0.2
     MDRectangleFlatButton:
         id: button_deletedoctor
-        text: "Удалить доктора"
+        text: "Удалить\n доктора"
         background_color:'#00FFCE'
         pos_hint: {"center_x":0.75, "center_y":0.1}
         on_press: root.DeleteDoctor()
+        size_hint_x:0.2
     MDRectangleFlatButton:
         id: button_postdoctor
-        text: "Добавить доктора"
+        text: "Добавить\n доктора"
         background_color:'#00FFCE'
         pos_hint: {"center_x":0.5, "center_y":0.1}
         on_press: root.PostDoctor()
+        size_hint_x:0.2
+
+<ChangeAdressScreen>:
+    name: 'ChangeAdress'
+    orientation: "vertical"
+    MDLabel:
+        id: text_label
+        font_size: "30sp"
+        color: "000000"
+        text: "Текущий адрес сервера"
+        halign: "center"
+        pos_hint: {"center_x": 0.5, "center_y":0.8}
+    MDTextField:
+        id: text_adress
+        text: root.link
+        pos_hint: {"center_x": 0.5, "center_y": 0.55}
+        size_hint_x:None
+        width:300
+    MDRectangleFlatButton:
+        id: button_changeadress
+        text: "Сохранить адрес"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":0.5, "center_y":0.1}
+        on_press: root.ChangeAdress()
