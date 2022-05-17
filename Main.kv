@@ -89,22 +89,25 @@ MainScreen:
     orientation: "vertical"
     MDLabel:
         id: text_label
+        halign: "center"
         font_size: "30sp"
         color: "000000"
         text: root.data_label
-        pos_hint: {"center_x": 0.5, "center_y":0.5}
-    MDRectangleFlatButton:
-        id: button_label
-        text: "Изменить надпись"
-        background_color:'#00FFCE'
-        pos_hint: {"center_x": 0.5, "center_y":0.4}
-        on_press: root.changetitle()
+        pos_hint: {"center_x": 0.5, "center_y":0.85}
     MDRectangleFlatButton:
         id: button_label1
         text: "Вывести список докторов"
         bold: True
         background_color:'#00FFCE'
         on_press: root.GetDoctors()
+        pos_hint: {"center_x": 0.5, "center_y":0.1}
+    ScrollView:
+        id: list_doctors
+        size_hint_y: 0.6
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
+        MDList:
+            id: mdlist_doctors
+            pos_hint: {"center_x": 0.5, "center_y":0.5}
 
 <ChangeDoctorScreen>:
     name: 'ChangeDoctor'

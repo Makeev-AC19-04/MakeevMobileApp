@@ -2,9 +2,12 @@ from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivymd.uix.list import MDList, TwoLineListItem
+from kivy.uix.scrollview import ScrollView
+from kivy.core.clipboard import Clipboard
 import requests
 from kivy.clock import Clock
-import time
+import json
 
 #GithubTest
 #Crossplatform kaif
@@ -21,17 +24,17 @@ class ContentNavigationDrawer(BoxLayout): #Отрисовка элементов
     pass
 
 class DoctorsScreen(Screen):
-    data_label = StringProperty("Текст")
-    data_role = StringProperty()
-
-    def changetitle(self):
-        name = self.ids.text_input.text
-        self.ids.text_label.text = name  # f'hello {name}' - для вывода дополненного текста
-        self.ids.text_input.text = ''
+    data_label = StringProperty("Список докторов")
+    #data_role = StringProperty()
 
     def GetDoctors(self):  # Получим список всех докторов
+        self.ids.mdlist_doctors.clear_widgets() # Очищаем список для предотвращения дублирования
         doctors = requests.get('https://localhost:5001/doctors', verify=False) #        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
-        self.ids.text_label.text = doctors.text
+        doctors = json.loads(doctors.text)
+        for i in doctors:
+            self.ids.mdlist_doctors.add_widget(TwoLineListItem(text = i['name'],
+                                                               secondary_text = 'id:' + str(i['id']),
+                                                               on_press=lambda x: Clipboard.copy(self.secondary_text)))
     pass
 
 class MainScreen(Screen):
@@ -95,7 +98,6 @@ class AuthorizationScreen(Screen):
 
 
 class MainApp(MDApp):
-    #theme_cls = ThemeManager()
     def build(self):
         sm = ScreenManager()
         sm.add_widget(MainScreen(name='Main'))
@@ -103,7 +105,6 @@ class MainApp(MDApp):
         sm.add_widget(DoctorsScreen(name='Doctors'))
         sm.add_widget(AuthorizationScreen(name='Authorization'))
         sm.add_widget(ChangeDoctorScreen(name='ChangeDoctor'))
-       #screen = Builder.load_string(KV)
         return sm
 
 MainApp().run()
