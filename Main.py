@@ -29,12 +29,10 @@ class DoctorsScreen(Screen):
 
     def GetDoctors(self):  # Получим список всех докторов
         self.ids.mdlist_doctors.clear_widgets() # Очищаем список для предотвращения дублирования
-        doctors = requests.get('https://localhost:5001/doctors', verify=False) #        self.ids.text_label.text = str(json.loads(doctors.text)) #Формируем список словарей из полученного json текста
-        doctors = json.loads(doctors.text)
+        doctors = requests.get('https://localhost:5001/doctors', verify=False)
+        doctors = json.loads(doctors.text)  # Формируем список словарей из полученного json текста
         for i in doctors:
-            self.ids.mdlist_doctors.add_widget(TwoLineListItem(text = i['name'],
-                                                               secondary_text = 'id:' + str(i['id']),
-                                                               on_press=lambda x: Clipboard.copy(self.secondary_text)))
+            self.ids.mdlist_doctors.add_widget(TwoLineListItem(text = i['name'], secondary_text = 'id:' + str(i['id'])))
     pass
 
 class MainScreen(Screen):
@@ -63,11 +61,12 @@ class ChangeDoctorScreen(Screen):
             self.doctorsdata = doctor.json()
 
     def ChangeDoctor(self):
-        self.doctorsdata['name'] = self.ids.text_doctorsname.text
-        self.doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
+        doctorsdata = {}
+        doctorsdata['name'] = self.ids.text_doctorsname.text
+        doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
         putreq = requests.put('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text,
                               verify=False,
-                              json=self.doctorsdata,
+                              json=doctorsdata,
                               headers={'Authorization': "Bearer {}".format(access_token.token)})
         if putreq.status_code == 200:
             Clock.schedule_once(lambda dt: self.ChangeLabel("Данные сохранены"))
@@ -78,6 +77,38 @@ class ChangeDoctorScreen(Screen):
         else:
             Clock.schedule_once(lambda dt: self.ChangeLabel("Произошла ошибка"))
             Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+
+    def DeleteDoctor(self):
+        delreq = requests.delete('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text,
+                              verify=False,
+                              headers={'Authorization': "Bearer {}".format(access_token.token)})
+        if delreq.status_code == 204:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Доктор удален"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+        elif delreq.status_code == 401:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Вы не авторизованы"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+        else:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Произошла ошибка"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+
+    def PostDoctor(self):
+        self.doctorsdata['name'] = self.ids.text_doctorsname.text
+        self.doctorsdata['specialityId'] = self.ids.text_doctorsspeciality.text
+        putreq = requests.post('https://localhost:5001/doctors/',
+                              verify=False,
+                              json=self.doctorsdata,
+                              headers={'Authorization': "Bearer {}".format(access_token.token)})
+        if putreq.status_code == 201:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Доктор добавлен"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+        elif putreq.status_code == 401:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Вы не авторизованы"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+        else:
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Произошла ошибка"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
+
     pass
 
 class AuthorizationScreen(Screen):

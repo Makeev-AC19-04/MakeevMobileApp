@@ -150,5 +150,17 @@ MainScreen:
         id: button_searchdoctor
         text: "Сохранить изменения"
         background_color:'#00FFCE'
-        pos_hint: {"center_x":0.5, "center_y":0.1}
+        pos_hint: {"center_x":0.25, "center_y":0.1}
         on_press: root.ChangeDoctor()
+    MDRectangleFlatButton:
+        id: button_deletedoctor
+        text: "Удалить доктора"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":0.75, "center_y":0.1}
+        on_press: root.DeleteDoctor()
+    MDRectangleFlatButton:
+        id: button_postdoctor
+        text: "Добавить доктора"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":0.5, "center_y":0.1}
+        on_press: root.PostDoctor()
