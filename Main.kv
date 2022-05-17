@@ -14,8 +14,8 @@ MainScreen:
             id: screen_manager
             Screen:
             DoctorsScreen:
-            OtherScreen:
             AuthorizationScreen:
+            ChangeDoctorScreen:
         MDNavigationDrawer: #Отрисовка панели навигации
             id: nav_drawer
             width: SidebarW
@@ -33,20 +33,15 @@ MainScreen:
                                     nav_drawer.set_state("close")
                                     screen_manager.current = 'Doctors'
                             OneLineListItem:
-                                text: 'Открыть другой экран'
+                                text: 'Авторизоваться'
                                 on_press:
                                     nav_drawer.set_state("close")
-                                    screen_manager.current = 'Other'         
-
-<OtherScreen>:
-    name: 'Other'
-    orientation: "vertical"
-    MDLabel:
-        id: text_label
-        font_size: "30sp"
-        color: "000000"
-        text: "Other text"
-        pos_hint: {"center_x": 0.5, "center_y":0.5}
+                                    screen_manager.current = 'Authorization'
+                            OneLineListItem:
+                                text: 'Изменить данные доктора'
+                                on_press:
+                                    nav_drawer.set_state("close")
+                                    screen_manager.current = 'ChangeDoctor'
 
 <AuthorizationScreen>:
     name: 'Authorization'
@@ -56,7 +51,8 @@ MainScreen:
         font_size: "30sp"
         color: "000000"
         text: "Вход в аккаунт"
-        pos_hint: {"center_x": 1, "center_y":1}
+        halign: "center"
+        pos_hint: {"center_x": 0.5, "center_y":0.8}
     MDTextField:
         id: text_login
         required: True
@@ -78,16 +74,17 @@ MainScreen:
         id: button_auth
         text: "Войти"
         background_color:'#00FFCE'
-        pos_hint: {"center_x":1, "center_y":1}
+        pos_hint: {"center_x":0.5, "center_y":0.3}
         on_press: root.Auth()
     MDLabel:
         id: text_role
         font_size: "30sp"
         color: "000000"
         text: "Ваша роль: "
-        pos_hint: {"center_x": 0.5, "center_y": 0.25}
+        halign: "center"
+        pos_hint: {"center_x": 0.5, "center_y": 0.15}
 
-<DoctorsScreen>:
+<DoctorsScreen>
     name: 'Doctors'
     orientation: "vertical"
     MDLabel:
@@ -108,6 +105,47 @@ MainScreen:
         bold: True
         background_color:'#00FFCE'
         on_press: root.GetDoctors()
-    #MDTextField:
-     #   id: text_input
-      #  hint_text: "No helper text"
+
+<ChangeDoctorScreen>:
+    name: 'ChangeDoctor'
+    orientation: "vertical"
+    MDLabel:
+        id: text_label
+        font_size: "30sp"
+        color: "000000"
+        text: "Изменить данные о докторе"
+        halign: "center"
+        pos_hint: {"center_x": 0.5, "center_y":0.8}
+    MDTextField:
+        id: text_searchdoctor
+        required: True
+        hint_text: "id доктора"
+        pos_hint: {"center_x": 0.5, "center_y": 0.55}
+        size_hint_x:None
+        width:300
+    MDRectangleFlatButton:
+        id: button_searchdoctor
+        text: "Найти доктора"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":0.5, "center_y":0.4}
+        on_press: root.SearchDoctor()
+    MDTextField:
+        id: text_doctorsname
+        required: True
+        hint_text: "ФИО доктора"
+        pos_hint: {"center_x": 0.5, "center_y": 0.3}
+        size_hint_x:None
+        width:300
+    MDTextField:
+        id: text_doctorsspeciality
+        required: True
+        hint_text: "id специальности доктора"
+        pos_hint: {"center_x": 0.5, "center_y": 0.2}
+        size_hint_x:None
+        width:300
+    MDRectangleFlatButton:
+        id: button_searchdoctor
+        text: "Сохранить изменения"
+        background_color:'#00FFCE'
+        pos_hint: {"center_x":0.5, "center_y":0.1}
+        on_press: root.ChangeDoctor()

@@ -1,12 +1,10 @@
 from kivymd.app import MDApp
-from kivy.app import App
-from kivymd.theming import ThemeManager
-from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 import requests
-import json
+from kivy.clock import Clock
+import time
 
 #GithubTest
 #Crossplatform kaif
@@ -42,19 +40,21 @@ class MainScreen(Screen):
 class NavigationLayout(Screen):
     pass
 
-class OtherScreen(Screen):
-    pass
-
 class ChangeDoctorScreen(Screen):
     global access_token
     doctorsdata = {}
 
+    def ChangeLabel(self, text):
+        self.ids.text_label.text = text
+
     def SearchDoctor(self):
+        label = self.ids.text_label.text
         doctor = requests.get('https://localhost:5001/doctors/' + self.ids.text_searchdoctor.text, verify=False)
         if doctor.status_code == 404:
-            self.ids.text_label.text = "Доктор не найден!"
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Доктор не найден!"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
         else:
-            self.ids.text_label.text = "Редактировать данные о докторе"
+#            self.ids.text_label.text = "Редактировать данные о докторе"
             self.ids.text_doctorsname.text = str(doctor.json()["name"])
             self.ids.text_doctorsspeciality.text = str(doctor.json()["specialityId"])
             self.doctorsdata = doctor.json()
@@ -67,11 +67,14 @@ class ChangeDoctorScreen(Screen):
                               json=self.doctorsdata,
                               headers={'Authorization': "Bearer {}".format(access_token.token)})
         if putreq.status_code == 200:
-         self.ids.text_label.text = "Данные сохранены"
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Данные сохранены"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
         elif putreq.status_code == 401:
-         self.ids.text_label.text = "Вы не авторизованы"
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Вы не авторизованы"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
         else:
-         self.ids.text_label.text = "Произошла ошибка"
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Произошла ошибка"))
+            Clock.schedule_once(lambda dt: self.ChangeLabel("Изменить данные о докторе"), 1.5)
     pass
 
 class AuthorizationScreen(Screen):
@@ -98,7 +101,6 @@ class MainApp(MDApp):
         sm.add_widget(MainScreen(name='Main'))
         sm.add_widget(NavigationLayout(name='Nav'))
         sm.add_widget(DoctorsScreen(name='Doctors'))
-        sm.add_widget(OtherScreen(name='Other'))
         sm.add_widget(AuthorizationScreen(name='Authorization'))
         sm.add_widget(ChangeDoctorScreen(name='ChangeDoctor'))
        #screen = Builder.load_string(KV)
