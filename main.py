@@ -37,10 +37,12 @@ MainScreen:
             ChangeAdressScreen:
         MDNavigationDrawer: #Отрисовка панели навигации
             id: nav_drawer
+            size_hint_x:0.5
             ContentNavigationDrawer:
                 BoxLayout:
                     orientation: 'vertical'
                     MDLabel:
+                        pos_hint: {"center_x": 0.55, "center_y":0}
                         text: 'Меню'
                     ScrollView:
                         MDList:
@@ -64,8 +66,6 @@ MainScreen:
                                 on_press:
                                     nav_drawer.set_state("close")
                                     screen_manager.current = 'ChangeAdress'
-                    #GridLayout:
-                    #StackLayout:
                     BoxLayout:
                         size_hint_x:0.8
                         pos_hint: {"center_x": 0.45, "center_y":0}
@@ -73,7 +73,6 @@ MainScreen:
                             pos_hint: {"center_x": 0.3, "center_y":0.8}
                             #halign: "center"
                             text: 'Изменить тему'
-                            #width: 20
                         MDSwitch:
                             pos_hint: {"center_x": 0.5, "center_y":0.8}
                             #halign: "center"
@@ -132,22 +131,24 @@ MainScreen:
         font_size: "30sp"
         color: "000000"
         text: root.data_label
-        pos_hint: {"center_x": 0.5, "center_y":0.85}
+        pos_hint: {"center_x": 0.5, "center_y":0.8}
+    ScrollView:
+        anchor_x: "center"
+        anchor_y: "center"
+        id: list_doctors
+        size_hint_y: 0.5
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
+        MDList:
+            id: mdlist_doctors
+            pos_hint: {"center_x": 0.5, "center_y":0}
     MDRectangleFlatButton:
         id: button_label1
-        text: "Вывести список докторов"
+        text: "Вывести"
         bold: True
         background_color:'#00FFCE'
         on_press: root.GetDoctors()
         size_hint_x:0.3
         pos_hint: {"center_x": 0.5, "center_y":0.1}
-    ScrollView:
-        id: list_doctors
-        size_hint_y: 0.6
-        pos_hint: {"center_x": 0.5, "center_y":0.5}
-        MDList:
-            id: mdlist_doctors
-            pos_hint: {"center_x": 0.5, "center_y":0.5}
 
 <ChangeDoctorScreen>:
     name: 'ChangeDoctor'
@@ -224,7 +225,7 @@ MainScreen:
         text: root.link
         pos_hint: {"center_x": 0.5, "center_y": 0.55}
         size_hint_x:None
-        size_hint_x:0.3
+        size_hint_x:0.5
     MDRectangleFlatButton:
         id: button_changeadress
         text: "Сохранить адрес"
@@ -236,7 +237,7 @@ MainScreen:
 
 class AccessToken():
     token = 'token'
-    link = 'https://localhost:5001/'
+    link = 'https://localhost:2007/'
     def __init__(self, newtkn):
         token = newtkn
 
@@ -272,7 +273,12 @@ class ChangeAdressScreen(Screen):
     link = access_token.link
     def ChangeAdress(self):
         access_token.link = self.ids.text_adress.text
-        toast("Адрес изменен")
+        try:
+            doctors = requests.get(access_token.link + 'doctors/', verify=False)
+        except (requests.exceptions.InvalidURL,requests.exceptions.ConnectionError):
+            toast("Неверный адрес")
+        else:
+            toast("Адрес изменен")
     pass
 
 class ChangeDoctorScreen(Screen):
